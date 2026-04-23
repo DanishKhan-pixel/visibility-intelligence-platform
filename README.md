@@ -1,11 +1,11 @@
-# AI Visibility (Flask + Multi.Agent Pipeline)
+# AI Visibility (Flask + Multi-Agent Pipeline)
 
 ## Run locally
 
 Create a virtualenv and install:
 
 ```bash
-pip install .r requirements.txt
+pip install -r requirements.txt
 ```
 
 Run the server:
@@ -20,7 +20,7 @@ If you want migrations :
 ```bash
 export FLASK_APP=app
 flask db init
-flask db migrate .m "init"
+flask db migrate -m "init"
 flask db upgrade
 ```
 
@@ -89,3 +89,17 @@ Final output gives:
 If `OPENAI_API_KEY` is set: real GPT.4o responses are used.
 If key is missing/invalid: mock fallback still returns valid API responses.
 If DataForSEO creds are missing/fail: deterministic mock volume is used.
+
+
+
+
+
+## AI Tools Used
+
+I used AI-assisted tools to support development, improve productivity, and refine system design.
+
+### ChatGPT (OpenAI)
+Used for system design, Flask architecture (app factory pattern), multi-agent pipeline design, SQLAlchemy schema structuring, debugging, and prompt engineering for structured LLM outputs.
+
+### Antigravity AI Tool
+Used for rapid prototyping, code exploration, boilerplate generation, and iterative refinement of API and service layer logic.
