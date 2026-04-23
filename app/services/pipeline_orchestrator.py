@@ -130,6 +130,8 @@ class PipelineOrchestrator:
                     priority=rec.priority,
                 )
                 db.session.add(rr)
+                # Ensure id/timestamps are populated before building API response payload.
+                db.session.flush()
                 rec_dicts.append(
                     {
                         "recommendation_uuid": rr.id,
@@ -139,7 +141,7 @@ class PipelineOrchestrator:
                         "rationale": rec.rationale,
                         "target_keywords": rec.target_keywords,
                         "priority": rr.priority,
-                        "created_at": rr.created_at.isoformat() + "Z",
+                        "created_at": rr.created_at.isoformat() + "Z" if rr.created_at else None,
                     }
                 )
 
