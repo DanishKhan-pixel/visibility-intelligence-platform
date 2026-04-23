@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
+from typing import Optional
 
 from sqlalchemy import DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column
@@ -14,7 +15,7 @@ class Recommendation(db.Model):
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     profile_id: Mapped[str] = mapped_column(String(36), ForeignKey("business_profiles.id"), nullable=False)
-    query_id: Mapped[str | None] = mapped_column(String(36), ForeignKey("discovered_queries.id"), nullable=True)
+    query_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("discovered_queries.id"), nullable=True)
 
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     content_type: Mapped[str] = mapped_column(String(50), nullable=False, default="blog_post")

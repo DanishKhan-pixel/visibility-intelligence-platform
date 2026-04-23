@@ -24,7 +24,8 @@ def safe_json_parse(text: str) -> Any:
     except Exception:
         pass
 
-    for regex in (_JSON_OBJECT_RE, _JSON_ARRAY_RE):
+    # Prefer arrays first so we don't accidentally extract an object within an array.
+    for regex in (_JSON_ARRAY_RE, _JSON_OBJECT_RE):
         m = regex.search(text)
         if not m:
             continue

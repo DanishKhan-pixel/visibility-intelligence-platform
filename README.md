@@ -58,6 +58,15 @@ export FLASK_APP=app
 flask run
 ```
 
+If you want migrations (recommended for the assessment):
+
+```bash
+export FLASK_APP=app
+flask db init
+flask db migrate -m "init"
+flask db upgrade
+```
+
 Optional env vars:
 
 - `OPENAI_API_KEY` to use real GPT-4o calls (otherwise mock fallback)

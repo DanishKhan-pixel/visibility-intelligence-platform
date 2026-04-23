@@ -6,7 +6,9 @@ from typing import Any
 from flask import Flask, jsonify
 
 from app.config import Config
+from app.models import pipeline_run, profile, query, recommendation  # noqa: F401
 from app.models.base import db
+from flask_migrate import Migrate
 
 
 def create_app(config_object: type[Config] | None = None) -> Flask:
@@ -17,6 +19,7 @@ def create_app(config_object: type[Config] | None = None) -> Flask:
     _register_error_handlers(app)
 
     db.init_app(app)
+    Migrate(app, db)
     with app.app_context():
         db.create_all()
 

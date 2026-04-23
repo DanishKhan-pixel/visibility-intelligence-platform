@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+*.pyo
+*.so
+.Python
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environments
+.env
+.env.*
+!.env.example
+venv/
+.venv/
+ENV/
+env/
+
+# Packaging/build
+build/
+dist/
+*.egg-info/
+
+# Local DB / app state
+*.db
+*.sqlite
+*.sqlite3
+instance/
+
+# Logs
+*.log
+
+# macOS / editors
+.DS_Store
+.vscode/
+.idea/
+
