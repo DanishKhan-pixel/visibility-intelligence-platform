@@ -159,6 +159,29 @@ Optional env vars:
 - `OPENAI_API_KEY` to use real GPT-4o calls (otherwise mock fallback)
 - `DATAFORSEO_LOGIN`, `DATAFORSEO_PASSWORD` to use real DataForSEO (otherwise mock fallback)
 - `DATABASE_URL` (default: `sqlite:///ai_visibility.db`)
+- `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_HOST`, `POSTGRES_PORT` (alternative to `DATABASE_URL`)
+
+### PostgreSQL setup example
+
+For your case:
+- database: `ai_visibility_db`
+- password: `root`
+
+Use either one of these:
+
+```bash
+# Option A: single URL
+export DATABASE_URL="postgresql+psycopg2://postgres:root@localhost:5432/ai_visibility_db"
+```
+
+```bash
+# Option B: split vars
+export POSTGRES_DB="ai_visibility_db"
+export POSTGRES_USER="postgres"
+export POSTGRES_PASSWORD="root"
+export POSTGRES_HOST="localhost"
+export POSTGRES_PORT="5432"
+```
 
 ## Tests
 
