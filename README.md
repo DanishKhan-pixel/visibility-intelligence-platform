@@ -32,15 +32,102 @@ This ensures the pipeline can always run in a clean evaluator environment.
 
 ## Endpoints
 
-- **POST** `/profiles` create a business profile
-- **POST** `/profiles/{id}/run` run pipeline and persist results
-- **GET** `/profiles/{id}/queries` list discovered+scored queries
-- **GET** `/profiles/{id}/recommendations` list recommendations
+- **POST** `/api/v1/profiles` create a business profile
+- **GET** `/api/v1/profiles/{profile_uuid}` get profile + summary stats
+- **POST** `/api/v1/profiles/{profile_uuid}/run` run pipeline and persist results
+- **GET** `/api/v1/profiles/{profile_uuid}/queries` list discovered+scored queries
+- **GET** `/api/v1/profiles/{profile_uuid}/recommendations` list recommendations
+- **POST** `/api/v1/queries/{query_uuid}/recheck` re-run scoring for one query
+
+## API documentation (Swagger)
+
+- Swagger UI: `/docs`
+- OpenAPI JSON: `/openapi.json`
+
+After starting the server, open:
+
+- `http://127.0.0.1:5000/docs`
 
 All responses use a consistent envelope:
 
 ```json
 { "success": true, "data": {}, "error": null }
+```
+
+## Step-by-step API test (curl)
+
+Assuming the server is running on `http://127.0.0.1:5000`.
+
+### 1) Create a business profile
+
+```bash
+curl -s -X POST "http://127.0.0.1:5000/api/v1/profiles" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Surfer SEO",
+    "domain": "surferseo.com",
+    "industry": "SEO Software",
+    "description": "AI-powered SEO content optimization tool",
+    "competitors": ["clearscope.io", "marketmuse.com", "frase.io"]
+  }'
+```
+
+Copy `profile_uuid` from the response and export it:
+
+```bash
+export PROFILE_UUID="paste-profile-uuid-here"
+```
+
+### 2) Get profile + summary stats
+
+```bash
+curl -s "http://127.0.0.1:5000/api/v1/profiles/$PROFILE_UUID"
+```
+
+### 3) Run the full pipeline (Agent 1 → 2 → 3)
+
+```bash
+curl -s -X POST "http://127.0.0.1:5000/api/v1/profiles/$PROFILE_UUID/run"
+```
+
+This returns:
+- `pipeline_id`
+- `queries_discovered`, `queries_scored`
+- `top_queries` (top 3 by opportunity)
+- `recommendations`
+
+### 4) List all queries (sorted by opportunity score desc)
+
+```bash
+curl -s "http://127.0.0.1:5000/api/v1/profiles/$PROFILE_UUID/queries"
+```
+
+#### Filters + pagination
+
+```bash
+# minimum opportunity score
+curl -s "http://127.0.0.1:5000/api/v1/profiles/$PROFILE_UUID/queries?min_score=0.7"
+
+# visibility filter: visible | not_visible
+curl -s "http://127.0.0.1:5000/api/v1/profiles/$PROFILE_UUID/queries?status=not_visible"
+
+# pagination
+curl -s "http://127.0.0.1:5000/api/v1/profiles/$PROFILE_UUID/queries?page=1&per_page=20"
+```
+
+### 5) List recommendations
+
+```bash
+curl -s "http://127.0.0.1:5000/api/v1/profiles/$PROFILE_UUID/recommendations"
+```
+
+### 6) Recheck a single query (Agent 2)
+
+First, grab a `query_uuid` from the queries list response, then:
+
+```bash
+export QUERY_UUID="paste-query-uuid-here"
+curl -s -X POST "http://127.0.0.1:5000/api/v1/queries/$QUERY_UUID/recheck"
 ```
 
 ## Run locally

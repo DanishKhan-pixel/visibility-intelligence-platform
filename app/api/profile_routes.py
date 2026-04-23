@@ -36,6 +36,7 @@ def create_profile():
 
     return ok(
         {
+            "id": profile.id,
             "profile_uuid": profile.id,
             "name": profile.name,
             "domain": profile.domain,
@@ -62,6 +63,7 @@ def get_profile(profile_uuid: str):
 
     return ok(
         {
+            "id": profile.id,
             "profile_uuid": profile.id,
             "name": profile.name,
             "domain": profile.domain,

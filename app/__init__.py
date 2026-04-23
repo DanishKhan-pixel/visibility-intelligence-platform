@@ -26,10 +26,12 @@ def create_app(config_object: type[Config] | None = None) -> Flask:
     from app.api.profile_routes import bp as profile_bp
     from app.api.query_routes import bp as query_bp
     from app.api.recommendation_routes import bp as recommendation_bp
+    from app.api.docs_routes import bp as docs_bp
 
     app.register_blueprint(profile_bp)
     app.register_blueprint(query_bp)
     app.register_blueprint(recommendation_bp)
+    app.register_blueprint(docs_bp)
 
     return app
 
