@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Visibility Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="hero">
+        <h1>AI Visibility Intelligence Dashboard</h1>
+        <p>Profile onboarding, query scoring, and recommendation workflow.</p>
+      </header>
+
+      <div id="alert" class="alert hidden"></div>
+
+      <section class="card">
+        <h2>Create Business Profile</h2>
+        <form id="profile-form" class="form-grid">
+          <input name="name" placeholder="Business name" required />
+          <input name="domain" placeholder="Domain (example.com)" required />
+          <input name="industry" placeholder="Industry" />
+          <input name="competitors" placeholder="Competitors, comma-separated" />
+          <textarea name="description" placeholder="Short description"></textarea>
+          <button type="submit">Create Profile</button>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>Workspace</h2>
+        <div class="actions">
+          <button id="refresh-profile">Refresh Profile</button>
+          <button id="run-pipeline">Run Full Pipeline</button>
+          <button id="fetch-queries">Fetch Queries</button>
+          <button id="fetch-recommendations">Fetch Recommendations</button>
+        </div>
+        <div class="stats" id="stats">
+          <div class="stat"><span>Profile UUID</span><strong id="stat-profile">-</strong></div>
+          <div class="stat"><span>Total Queries</span><strong id="stat-queries">0</strong></div>
+          <div class="stat"><span>Visible Queries</span><strong id="stat-visible">0</strong></div>
+          <div class="stat"><span>Avg Opportunity</span><strong id="stat-avg">N/A</strong></div>
+        </div>
+      </section>
+
+      <section class="tabs">
+        <button class="tab active" data-tab="overview">Overview</button>
+        <button class="tab" data-tab="queries">Queries</button>
+        <button class="tab" data-tab="recommendations">Recommendations</button>
+      </section>
+
+      <section class="card tab-panel" id="overview-panel">
+        <h3>Pipeline Snapshot</h3>
+        <div class="snapshot">
+          <div class="stat"><span>Pipeline ID</span><strong id="pipeline-id">-</strong></div>
+          <div class="stat"><span>Status</span><strong id="pipeline-status">-</strong></div>
+          <div class="stat"><span>Discovered</span><strong id="pipeline-discovered">0</strong></div>
+          <div class="stat"><span>Scored</span><strong id="pipeline-scored">0</strong></div>
+        </div>
+      </section>
+
+      <section class="card tab-panel hidden" id="queries-panel">
+        <h3>Query Explorer</h3>
+        <div class="filters">
+          <input type="number" id="min-score" placeholder="Min opportunity score" />
+          <select id="visibility-status">
+            <option value="">All visibility states</option>
+            <option value="visible">Visible</option>
+            <option value="not_visible">Not visible</option>
+          </select>
+          <button id="apply-filters">Apply Filters</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Query</th>
+                <th>Volume</th>
+                <th>Difficulty</th>
+                <th>Opportunity</th>
+                <th>Visible</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="queries-body">
+              <tr><td colspan="6">No queries loaded.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card tab-panel hidden" id="recommendations-panel">
+        <h3>Recommendation Board</h3>
+        <div id="recommendations-grid" class="recommendation-grid">
+          <p>No recommendations yet.</p>
+        </div>
+      </section>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  </body>
+</html>

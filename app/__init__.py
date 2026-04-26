@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 
 from app.config import Config
 from app.models import pipeline_run, profile, query, recommendation  # noqa: F401
@@ -12,7 +12,7 @@ from flask_migrate import Migrate
 
 
 def create_app(config_object: type[Config] | None = None) -> Flask:
-    app = Flask(__name__)
+    app = Flask(__name__, template_folder="../templates", static_folder="../static")
     app.config.from_object(config_object or Config)
 
     _configure_logging(app)
@@ -32,6 +32,10 @@ def create_app(config_object: type[Config] | None = None) -> Flask:
     app.register_blueprint(query_bp)
     app.register_blueprint(recommendation_bp)
     app.register_blueprint(docs_bp)
+
+    @app.get("/")
+    def index():
+        return render_template("index.html")
 
     return app
 

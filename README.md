@@ -15,6 +15,14 @@ export FLASK_APP=app
 flask run
 ```
 
+Frontend is served by Flask using:
+
+- `templates/index.html`
+- `static/css/`
+- `static/js/`
+- `static/images/`
+- `static/uploads/`
+
 If you want migrations :
 
 ```bash
@@ -55,6 +63,7 @@ Final output gives:
 ### Base URLs
 
 . App: `http://127.0.0.1:5000`
+. Dashboard UI: `http://127.0.0.1:5000/`
 . Swagger: `http://127.0.0.1:5000/docs`
 . OpenAPI: `http://127.0.0.1:5000/openapi.json`
 
