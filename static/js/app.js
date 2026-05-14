@@ -1,5 +1,6 @@
 (function () {
-  const state = {
+  // Global state accessible for chart updates
+  window.state = {
     profile: null,
     queries: [],
     recommendations: [],
@@ -45,7 +46,7 @@
   }
 
   function profileUuid() {
-    return state.profile && state.profile.profile_uuid;
+    return window.state.profile && window.state.profile.profile_uuid;
   }
 
   function ensureProfile() {
@@ -56,25 +57,26 @@
 
   function updateStats() {
     statProfile.textContent = profileUuid() || "-";
-    statQueries.textContent = String(state.queries.length || state.profile?.stats?.total_queries || 0);
-    statVisible.textContent = String(state.queries.filter((q) => q.domain_visible).length);
-    statAvg.textContent = String(state.profile?.stats?.avg_opportunity_score ?? "N/A");
+    statQueries.textContent = String(window.state.queries.length || window.state.profile?.stats?.total_queries || 0);
+    statVisible.textContent = String(window.state.queries.filter((q) => q.domain_visible).length);
+    const avgScore = window.state.profile?.stats?.avg_opportunity_score;
+    statAvg.textContent = avgScore !== undefined ? String(avgScore) : "N/A";
   }
 
   function updatePipeline() {
-    pipelineId.textContent = state.pipeline?.pipeline_id || "-";
-    pipelineStatus.textContent = state.pipeline?.status || "-";
-    pipelineDiscovered.textContent = String(state.pipeline?.queries_discovered || 0);
-    pipelineScored.textContent = String(state.pipeline?.queries_scored || 0);
+    pipelineId.textContent = window.state.pipeline?.pipeline_id || "-";
+    pipelineStatus.textContent = window.state.pipeline?.status || "-";
+    pipelineDiscovered.textContent = String(window.state.pipeline?.queries_discovered || 0);
+    pipelineScored.textContent = String(window.state.pipeline?.queries_scored || 0);
   }
 
   function renderQueries() {
-    if (!state.queries.length) {
+    if (!window.state.queries.length) {
       queriesBodyEl.innerHTML = '<tr><td colspan="6">No queries loaded.</td></tr>';
       return;
     }
 
-    queriesBodyEl.innerHTML = state.queries
+    queriesBodyEl.innerHTML = window.state.queries
       .map(
         (q) => `
         <tr>
@@ -83,7 +85,7 @@
           <td>${q.competitive_difficulty}</td>
           <td>${q.opportunity_score}</td>
           <td>${q.domain_visible ? "Yes" : "No"}</td>
-          <td><button data-recheck="${q.query_uuid}">Recheck</button></td>
+          <td><button data-recheck="${q.query_uuid}" class="btn btn-sm btn-secondary">Recheck</button></td>
         </tr>
       `
       )
@@ -91,12 +93,12 @@
   }
 
   function renderRecommendations() {
-    if (!state.recommendations.length) {
+    if (!window.state.recommendations.length) {
       recommendationsGridEl.innerHTML = "<p>No recommendations yet.</p>";
       return;
     }
 
-    recommendationsGridEl.innerHTML = state.recommendations
+    recommendationsGridEl.innerHTML = window.state.recommendations
       .map(
         (rec) => `
         <article class="recommendation-card">
@@ -117,6 +119,12 @@
     document.getElementById("overview-panel").classList.toggle("hidden", tabName !== "overview");
     document.getElementById("queries-panel").classList.toggle("hidden", tabName !== "queries");
     document.getElementById("recommendations-panel").classList.toggle("hidden", tabName !== "recommendations");
+    document.getElementById("analytics-panel").classList.toggle("hidden", tabName !== "analytics");
+
+    // Trigger chart init when analytics tab is selected
+    if (tabName === "analytics" && typeof initCharts === "function") {
+      initCharts();
+    }
   }
 
   async function fetchQueries() {
@@ -126,15 +134,20 @@
     if (statusEl.value) params.set("status", statusEl.value);
     const qs = params.toString();
     const data = await request(`/api/v1/profiles/${profileUuid()}/queries${qs ? `?${qs}` : ""}`);
-    state.queries = data.items || [];
+    window.state.queries = data.items || [];
     renderQueries();
     updateStats();
+
+    // Update chart data if charts are initialized
+    if (typeof updateCharts === "function") {
+      updateCharts();
+    }
   }
 
   async function fetchRecommendations() {
     ensureProfile();
     const data = await request(`/api/v1/profiles/${profileUuid()}/recommendations`);
-    state.recommendations = data.items || [];
+    window.state.recommendations = data.items || [];
     renderRecommendations();
   }
 
@@ -163,14 +176,14 @@
     };
 
     await withLoading(async () => {
-      state.profile = await request("/api/v1/profiles", {
+      window.state.profile = await request("/api/v1/profiles", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
-      state.queries = [];
-      state.recommendations = [];
-      state.pipeline = null;
+      window.state.queries = [];
+      window.state.recommendations = [];
+      window.state.pipeline = null;
       updateStats();
       updatePipeline();
       renderQueries();
@@ -182,7 +195,7 @@
   document.getElementById("refresh-profile").addEventListener("click", () =>
     withLoading(async () => {
       ensureProfile();
-      state.profile = await request(`/api/v1/profiles/${profileUuid()}`);
+      window.state.profile = await request(`/api/v1/profiles/${profileUuid()}`);
       updateStats();
     })
   );
@@ -190,7 +203,7 @@
   document.getElementById("run-pipeline").addEventListener("click", () =>
     withLoading(async () => {
       ensureProfile();
-      state.pipeline = await request(`/api/v1/profiles/${profileUuid()}/run`, { method: "POST" });
+      window.state.pipeline = await request(`/api/v1/profiles/${profileUuid()}/run`, { method: "POST" });
       updatePipeline();
       await fetchQueries();
       await fetchRecommendations();
@@ -231,4 +244,7 @@
       await fetchQueries();
     });
   });
+
+  // Expose renderQueries globally for chart integration
+  window.renderQueries = renderQueries;
 })();

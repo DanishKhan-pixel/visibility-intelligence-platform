@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from flask import Blueprint
+from flask_login import current_user, login_required
 
 from app.api._responses import err, ok
 from app.models.base import db
@@ -11,9 +12,14 @@ bp = Blueprint("recommendations", __name__, url_prefix="/api/v1")
 
 
 @bp.get("/profiles/<profile_uuid>/recommendations")
+@login_required
 def list_recommendations(profile_uuid: str):
     profile = db.session.get(BusinessProfile, profile_uuid)
     if not profile:
+        return err("profile not found", "NOT_FOUND", 404)
+
+    # Verify ownership
+    if profile.user_id != current_user.id:
         return err("profile not found", "NOT_FOUND", 404)
 
     rows = (
@@ -38,4 +44,3 @@ def list_recommendations(profile_uuid: str):
     ]
 
     return ok({"items": data, "total": len(data)})
-

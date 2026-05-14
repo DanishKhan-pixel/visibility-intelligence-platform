@@ -1,102 +1,297 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI Visibility Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
-  </head>
-  <body>
-    <div class="page">
-      <header class="hero">
-        <h1>AI Visibility Intelligence Dashboard</h1>
-        <p>Profile onboarding, query scoring, and recommendation workflow.</p>
-      </header>
+{% extends "layouts/base.html" %}
 
-      <div id="alert" class="alert hidden"></div>
+{% block title %}AI Visibility Dashboard{% endblock %}
 
-      <section class="card">
-        <h2>Create Business Profile</h2>
-        <form id="profile-form" class="form-grid">
-          <input name="name" placeholder="Business name" required />
-          <input name="domain" placeholder="Domain (example.com)" required />
-          <input name="industry" placeholder="Industry" />
-          <input name="competitors" placeholder="Competitors, comma-separated" />
-          <textarea name="description" placeholder="Short description"></textarea>
-          <button type="submit">Create Profile</button>
-        </form>
-      </section>
+{% block body %}
+<div class="page">
+  <header class="hero">
+    <h1>AI Visibility Intelligence Dashboard</h1>
+    <p>Profile onboarding, query scoring, and recommendation workflow.</p>
+  </header>
 
-      <section class="card">
-        <h2>Workspace</h2>
-        <div class="actions">
-          <button id="refresh-profile">Refresh Profile</button>
-          <button id="run-pipeline">Run Full Pipeline</button>
-          <button id="fetch-queries">Fetch Queries</button>
-          <button id="fetch-recommendations">Fetch Recommendations</button>
-        </div>
-        <div class="stats" id="stats">
-          <div class="stat"><span>Profile UUID</span><strong id="stat-profile">-</strong></div>
-          <div class="stat"><span>Total Queries</span><strong id="stat-queries">0</strong></div>
-          <div class="stat"><span>Visible Queries</span><strong id="stat-visible">0</strong></div>
-          <div class="stat"><span>Avg Opportunity</span><strong id="stat-avg">N/A</strong></div>
-        </div>
-      </section>
+  <div id="alert" class="alert hidden"></div>
 
-      <section class="tabs">
-        <button class="tab active" data-tab="overview">Overview</button>
-        <button class="tab" data-tab="queries">Queries</button>
-        <button class="tab" data-tab="recommendations">Recommendations</button>
-      </section>
+  <section class="card">
+    <h2>Create Business Profile</h2>
+    <form id="profile-form" class="form-grid">
+      <input name="name" placeholder="Business name" required />
+      <input name="domain" placeholder="Domain (example.com)" required />
+      <input name="industry" placeholder="Industry" />
+      <input name="competitors" placeholder="Competitors, comma-separated" />
+      <textarea name="description" placeholder="Short description"></textarea>
+      <button type="submit">Create Profile</button>
+    </form>
+  </section>
 
-      <section class="card tab-panel" id="overview-panel">
-        <h3>Pipeline Snapshot</h3>
-        <div class="snapshot">
-          <div class="stat"><span>Pipeline ID</span><strong id="pipeline-id">-</strong></div>
-          <div class="stat"><span>Status</span><strong id="pipeline-status">-</strong></div>
-          <div class="stat"><span>Discovered</span><strong id="pipeline-discovered">0</strong></div>
-          <div class="stat"><span>Scored</span><strong id="pipeline-scored">0</strong></div>
-        </div>
-      </section>
-
-      <section class="card tab-panel hidden" id="queries-panel">
-        <h3>Query Explorer</h3>
-        <div class="filters">
-          <input type="number" id="min-score" placeholder="Min opportunity score" />
-          <select id="visibility-status">
-            <option value="">All visibility states</option>
-            <option value="visible">Visible</option>
-            <option value="not_visible">Not visible</option>
-          </select>
-          <button id="apply-filters">Apply Filters</button>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Query</th>
-                <th>Volume</th>
-                <th>Difficulty</th>
-                <th>Opportunity</th>
-                <th>Visible</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody id="queries-body">
-              <tr><td colspan="6">No queries loaded.</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="card tab-panel hidden" id="recommendations-panel">
-        <h3>Recommendation Board</h3>
-        <div id="recommendations-grid" class="recommendation-grid">
-          <p>No recommendations yet.</p>
-        </div>
-      </section>
+  <section class="card">
+    <h2>Workspace</h2>
+    <div class="actions">
+      <button id="refresh-profile">Refresh Profile</button>
+      <button id="run-pipeline">Run Full Pipeline</button>
+      <button id="fetch-queries">Fetch Queries</button>
+      <button id="fetch-recommendations">Fetch Recommendations</button>
     </div>
+    <div class="stats" id="stats">
+      <div class="stat"><span>Profile UUID</span><strong id="stat-profile">-</strong></div>
+      <div class="stat"><span>Total Queries</span><strong id="stat-queries">0</strong></div>
+      <div class="stat"><span>Visible Queries</span><strong id="stat-visible">0</strong></div>
+      <div class="stat"><span>Avg Opportunity</span><strong id="stat-avg">N/A</strong></div>
+    </div>
+  </section>
 
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
-  </body>
-</html>
+  <section class="tabs">
+    <button class="tab active" data-tab="overview">Overview</button>
+    <button class="tab" data-tab="queries">Queries</button>
+    <button class="tab" data-tab="recommendations">Recommendations</button>
+    <button class="tab" data-tab="analytics">Analytics</button>
+  </section>
+
+  <section class="card tab-panel" id="overview-panel">
+    <h3>Pipeline Snapshot</h3>
+    <div class="snapshot">
+      <div class="stat"><span>Pipeline ID</span><strong id="pipeline-id">-</strong></div>
+      <div class="stat"><span>Status</span><strong id="pipeline-status">-</strong></div>
+      <div class="stat"><span>Discovered</span><strong id="pipeline-discovered">0</strong></div>
+      <div class="stat"><span>Scored</span><strong id="pipeline-scored">0</strong></div>
+    </div>
+  </section>
+
+  <section class="card tab-panel hidden" id="queries-panel">
+    <h3>Query Explorer</h3>
+    <div class="filters">
+      <input type="number" id="min-score" placeholder="Min opportunity score" />
+      <select id="visibility-status">
+        <option value="">All visibility states</option>
+        <option value="visible">Visible</option>
+        <option value="not_visible">Not visible</option>
+      </select>
+      <button id="apply-filters">Apply Filters</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Query</th>
+            <th>Volume</th>
+            <th>Difficulty</th>
+            <th>Opportunity</th>
+            <th>Visible</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="queries-body">
+          <tr><td colspan="6">No queries loaded.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card tab-panel hidden" id="recommendations-panel">
+    <h3>Recommendation Board</h3>
+    <div id="recommendations-grid" class="recommendation-grid">
+      <p>No recommendations yet.</p>
+    </div>
+  </section>
+
+  <section class="card tab-panel hidden" id="analytics-panel">
+    <h3>Analytics Dashboard</h3>
+    <div class="grid-2">
+      <div>
+        <h4>Query Distribution by Opportunity Score</h4>
+        <div class="chart-container">
+          <canvas id="opportunityChart"></canvas>
+        </div>
+      </div>
+      <div>
+        <h4>Visibility Status</h4>
+        <div class="chart-container">
+          <canvas id="visibilityChart"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="grid-2" style="margin-top: 24px;">
+      <div>
+        <h4>Search Volume Distribution</h4>
+        <div class="chart-container">
+          <canvas id="volumeChart"></canvas>
+        </div>
+      </div>
+      <div>
+        <h4>Competitive Difficulty</h4>
+        <div class="chart-container">
+          <canvas id="difficultyChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Initialize charts when analytics tab is clicked
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      if (this.dataset.tab === 'analytics') {
+        initCharts();
+      }
+    });
+  });
+
+  let chartsInitialized = false;
+
+  function initCharts() {
+    if (chartsInitialized) return;
+    chartsInitialized = true;
+
+    // Opportunity Score Distribution
+    const oppCtx = document.getElementById('opportunityChart').getContext('2d');
+    new Chart(oppCtx, {
+      type: 'bar',
+      data: {
+        labels: ['0-0.2', '0.2-0.4', '0.4-0.6', '0.6-0.8', '0.8-1.0'],
+        datasets: [{
+          label: 'Query Count',
+          data: [0, 0, 0, 0, 0],
+          backgroundColor: '#2563eb'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } }
+      }
+    });
+
+    // Visibility Status Pie Chart
+    const visCtx = document.getElementById('visibilityChart').getContext('2d');
+    new Chart(visCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Visible', 'Not Visible'],
+        datasets: [{
+          data: [0, 0],
+          backgroundColor: ['#10b981', '#ef4444']
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+
+    // Search Volume Distribution
+    const volCtx = document.getElementById('volumeChart').getContext('2d');
+    new Chart(volCtx, {
+      type: 'bar',
+      data: {
+        labels: ['0-100', '100-500', '500-1000', '1000-5000', '5000+'],
+        datasets: [{
+          label: 'Queries',
+          data: [0, 0, 0, 0, 0],
+          backgroundColor: '#06b6d4'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } }
+      }
+    });
+
+    // Difficulty Distribution
+    const diffCtx = document.getElementById('difficultyChart').getContext('2d');
+    new Chart(diffCtx, {
+      type: 'line',
+      data: {
+        labels: ['0-20', '20-40', '40-60', '60-80', '80-100'],
+        datasets: [{
+          label: 'Query Count',
+          data: [0, 0, 0, 0, 0],
+          borderColor: '#f59e0b',
+          backgroundColor: 'rgba(245, 158, 11, 0.1)',
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } }
+      }
+    });
+  }
+
+  // Update chart data when queries change
+  const originalRenderQueries = renderQueries;
+  renderQueries = function() {
+    originalRenderQueries();
+    updateCharts();
+  };
+
+  function updateCharts() {
+    const queries = window.state?.queries || [];
+    if (!chartsInitialized || queries.length === 0) return;
+
+    // Calculate distribution data
+    const oppBuckets = [0, 0, 0, 0, 0];
+    const visCounts = [0, 0];
+    const volBuckets = [0, 0, 0, 0, 0];
+    const diffBuckets = [0, 0, 0, 0, 0];
+
+    queries.forEach(q => {
+      // Opportunity buckets
+      const opp = q.opportunity_score;
+      if (opp < 0.2) oppBuckets[0]++;
+      else if (opp < 0.4) oppBuckets[1]++;
+      else if (opp < 0.6) oppBuckets[2]++;
+      else if (opp < 0.8) oppBuckets[3]++;
+      else oppBuckets[4]++;
+
+      // Visibility
+      if (q.domain_visible) visCounts[0]++;
+      else visCounts[1]++;
+
+      // Volume
+      const vol = q.estimated_search_volume || 0;
+      if (vol < 100) volBuckets[0]++;
+      else if (vol < 500) volBuckets[1]++;
+      else if (vol < 1000) volBuckets[2]++;
+      else if (vol < 5000) volBuckets[3]++;
+      else volBuckets[4]++;
+
+      // Difficulty
+      const diff = q.competitive_difficulty || 0;
+      if (diff < 20) diffBuckets[0]++;
+      else if (diff < 40) diffBuckets[1]++;
+      else if (diff < 60) diffBuckets[2]++;
+      else if (diff < 80) diffBuckets[3]++;
+      else diffBuckets[4]++;
+    });
+
+    // Update charts if they exist
+    const charts = Chart.instances;
+    if (charts.length > 0) {
+      charts[0].data.datasets[0].data = oppBuckets;
+      charts[0].update();
+
+      if (charts.length > 1) {
+        charts[1].data.datasets[0].data = visCounts;
+        charts[1].update();
+      }
+
+      if (charts.length > 2) {
+        charts[2].data.datasets[0].data = volBuckets;
+        charts[2].update();
+      }
+
+      if (charts.length > 3) {
+        charts[3].data.datasets[0].data = diffBuckets;
+        charts[3].update();
+      }
+    }
+  }
+
+  // Store state globally for chart updates
+  window.state = { queries: [], profile: null, recommendations: [], pipeline: null };
+</script>
+{% endblock %}

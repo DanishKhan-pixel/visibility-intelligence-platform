@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from flask import Blueprint, request
+from flask_login import current_user, login_required
 
 from app.api._responses import err, ok
 from app.models.base import db
@@ -13,11 +14,22 @@ from app.agents.scoring_agent import VisibilityScoringAgent
 bp = Blueprint("queries", __name__, url_prefix="/api/v1")
 
 
-@bp.get("/profiles/<profile_uuid>/queries")
-def list_queries(profile_uuid: str):
+def _get_profile_check_uuid(profile_uuid: str) -> tuple[BusinessProfile | None, str | None]:
+    """Get profile and verify ownership. Returns (profile, error_message)."""
     profile = db.session.get(BusinessProfile, profile_uuid)
     if not profile:
-        return err("profile not found", "NOT_FOUND", 404)
+        return None, "profile not found"
+    if profile.user_id != current_user.id:
+        return None, "profile not found"
+    return profile, None
+
+
+@bp.get("/profiles/<profile_uuid>/queries")
+@login_required
+def list_queries(profile_uuid: str):
+    profile, error = _get_profile_check_uuid(profile_uuid)
+    if error:
+        return err(error, "NOT_FOUND", 404)
 
     min_score = request.args.get("min_score", type=float)
     status = request.args.get("status", type=str)
@@ -48,6 +60,7 @@ def list_queries(profile_uuid: str):
 
 
 @bp.post("/queries/<query_uuid>/recheck")
+@login_required
 def recheck_query(query_uuid: str):
     dq = db.session.get(DiscoveredQuery, query_uuid)
     if not dq:
@@ -56,6 +69,10 @@ def recheck_query(query_uuid: str):
     profile = db.session.get(BusinessProfile, dq.profile_id)
     if not profile:
         return err("profile not found for query", "NOT_FOUND", 404)
+
+    # Verify ownership
+    if profile.user_id != current_user.id:
+        return err("query not found", "NOT_FOUND", 404)
 
     agent = VisibilityScoringAgent()
     ctx = AgentContext(pipeline_id=dq.run_id or dq.id)
@@ -80,4 +97,3 @@ def recheck_query(query_uuid: str):
             "discovered_at": dq.created_at.isoformat() + "Z",
         }
     )
-
