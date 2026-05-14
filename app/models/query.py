@@ -1,13 +1,17 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import db
+
+
+def _utc_now() -> datetime:
+    return datetime.now(timezone.utc)
 
 
 class DiscoveredQuery(db.Model):
@@ -25,4 +29,4 @@ class DiscoveredQuery(db.Model):
     visibility_position: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     opportunity_score: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
 
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_utc_now, nullable=False)

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import uuid4
 
 from sqlalchemy import select
@@ -50,7 +50,7 @@ class PipelineOrchestrator:
         if not profile:
             raise ValueError("Profile not found")
 
-        run = PipelineRun(id=pipeline_id, profile_id=profile_id, status="running", started_at=datetime.utcnow())
+        run = PipelineRun(id=pipeline_id, profile_id=profile_id, status="running", started_at=datetime.now(timezone.utc))
         db.session.add(run)
         db.session.commit()
 
@@ -147,7 +147,7 @@ class PipelineOrchestrator:
 
             run.tokens_used = tokens_used
             run.status = "completed"
-            run.completed_at = datetime.utcnow()
+            run.completed_at = datetime.now(timezone.utc)
             db.session.commit()
 
             return PipelineResponse(
@@ -163,7 +163,7 @@ class PipelineOrchestrator:
             self.logger.exception("[%s] pipeline failed: %s", pipeline_id, e)
             run.status = "failed"
             run.error_message = str(e)
-            run.completed_at = datetime.utcnow()
+            run.completed_at = datetime.now(timezone.utc)
             db.session.commit()
             return PipelineResponse(
                 pipeline_id=pipeline_id,

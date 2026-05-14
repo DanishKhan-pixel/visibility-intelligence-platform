@@ -1,13 +1,17 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from sqlalchemy import DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import db
+
+
+def _utc_now() -> datetime:
+    return datetime.now(timezone.utc)
 
 
 class Recommendation(db.Model):
@@ -21,4 +25,4 @@ class Recommendation(db.Model):
     content_type: Mapped[str] = mapped_column(String(50), nullable=False, default="blog_post")
     priority: Mapped[str] = mapped_column(String(20), nullable=False, default="medium")
 
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_utc_now, nullable=False)
