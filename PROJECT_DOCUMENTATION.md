@@ -8,6 +8,7 @@ The system lets you:
 
 - create a business profile
 - discover relevant user search queries
+
 - score those queries by opportunity
 - generate recommendation ideas for high-value gaps
 - recheck scoring for individual queries later

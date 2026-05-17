@@ -13,6 +13,7 @@ from app.services.pipeline_orchestrator import PipelineOrchestrator
 bp = Blueprint("profiles", __name__, url_prefix="/api/v1")
 
 
+
 @bp.post("/profiles")
 @login_required
 def create_profile():
@@ -133,3 +134,10 @@ def run_pipeline(profile_uuid: str):
             "tokens_used": result.tokens_used,
         }
     )
+
+
+
+
+
+
+

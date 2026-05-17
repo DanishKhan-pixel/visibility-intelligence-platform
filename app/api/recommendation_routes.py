@@ -44,3 +44,9 @@ def list_recommendations(profile_uuid: str):
     ]
 
     return ok({"items": data, "total": len(data)})
+
+
+
+
+
+

@@ -19,6 +19,10 @@ class ScoredQuery:
     opportunity_score: float
 
 
+
+
+
+
 class VisibilityScoringAgent(BaseAgent):
     name = "visibility_scoring"
 
